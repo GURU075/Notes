@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@PayloadRoot - Interactive Notes</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: "Segoe UI", sans-serif;
+      line-height: 1.6;
+      padding: 2rem;
+    }
+
+    h1, h2 {
+      color: #00bcd4;
+    }
+
+    .section {
+      background: #1e1e1e;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #00e676;
+      font-size: 1.1rem;
+    }
+
+    code {
+      background: #2b2b2b;
+      padding: 0.2rem 0.4rem;
+      border-radius: 5px;
+      color: #ffcc80;
+      font-family: monospace;
+    }
+
+    pre {
+      background: #2b2b2b;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    .tip, .note, .function {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      border-left: 4px solid;
+    }
+
+    .tip { border-color: #00e676; }
+    .note { border-color: #ffea00; }
+    .function { border-color: #2196f3; }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>@PayloadRoot Annotation - Interactive Notes</h1>
+
+  <div class="section">
+    <h2>📍 Where used</h2>
+    <p>On methods inside an <code>@Endpoint</code>.</p>
+  </div>
+
+  <div class="section">
+    <details open>
+      <summary>💡 What it does</summary>
+      <div class="note">
+        <p>Tells Spring which <strong>SOAP request XML element</strong> should be mapped to this method.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="section">
+    <details>
+      <summary>✅ When to use</summary>
+      <div class="tip">
+        <p>Use it when defining a method to handle a specific SOAP request type.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="section">
+    <details>
+      <summary>🧠 Function</summary>
+      <div class="function">
+        <p>The <code>MessageDispatcher</code> checks the XML’s root element and <strong>matches it to the correct method</strong> via this annotation.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="section">
+    <details>
+      <summary>🧩 Example</summary>
+      <pre><code class="language-java">
+@PayloadRoot(namespace = NAMESPACE, localPart = "EmployeeRequest")
+public void handleEmployeeRequest(EmployeeRequest request) {
+    // handle SOAP request here
+}
+      </code></pre>
+
+      <pre><code class="language-xml">
+<EmployeeRequest>
+   ...
+</EmployeeRequest>
+      </code></pre>
+
+      <p>→ gets routed to the method annotated with 
+        <code>@PayloadRoot(localPart = "EmployeeRequest")</code>.
+      </p>
+    </details>
+  </div>
+
+  <footer>
+    © 2025 Interactive Notes | Spring SOAP - @PayloadRoot
+  </footer>
+
+</body>
+</html>
