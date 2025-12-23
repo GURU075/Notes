@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dependency Inversion Principle (DIP) – Complete Explanation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #111827;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        section {
+            max-width: 1000px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        h1, h2, h3 {
+            color: #111827;
+        }
+
+        h2 {
+            margin-top: 40px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+
+        p {
+            margin: 12px 0;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        code {
+            background: #e5e7eb;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .bad {
+            background: #fee2e2;
+            border-left: 5px solid #dc2626;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .good {
+            background: #dcfce7;
+            border-left: 5px solid #16a34a;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .note {
+            background: #e0f2fe;
+            border-left: 5px solid #0284c7;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #111827;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Dependency Inversion Principle (DIP)</h1>
+    <p>Detailed Explanation with Examples – Interview Ready</p>
+</header>
+
+<section>
+
+    <h2>1. What is the Dependency Inversion Principle?</h2>
+
+    <p>
+        The <strong>Dependency Inversion Principle (DIP)</strong> states:
+    </p>
+
+    <p>
+        <strong>
+            “High-level modules should not depend on low-level modules.
+            Both should depend on abstractions.
+            Abstractions should not depend on details; details should depend on abstractions.”
+        </strong>
+    </p>
+
+    <p>
+        In simple terms, your <strong>business logic</strong> should not be tightly
+        coupled to <strong>implementation details</strong> like databases, APIs, or file systems.
+    </p>
+
+    <div class="note">
+        <strong>Key idea:</strong><br>
+        If your core logic breaks when you change a low-level class → DIP is violated.
+    </div>
+
+    <h2>2. Why DIP is Important</h2>
+
+    <ul>
+        <li>Reduces tight coupling</li>
+        <li>Makes systems flexible and extensible</li>
+        <li>Improves testability (mocking becomes easy)</li>
+        <li>Supports clean architecture</li>
+        <li>Allows easy replacement of implementations</li>
+    </ul>
+
+    <h2>3. DIP Violation Example (Wrong Design)</h2>
+
+    <div class="bad">
+        <strong>Problem:</strong> High-level module depends on a concrete class
+    </div>
+
+    <pre>
+class MySQLDatabase {
+    public void save(String data) {
+        // save to MySQL
+    }
+}
+
+class OrderService {
+
+    private MySQLDatabase database = new MySQLDatabase();
+
+    public void placeOrder(String order) {
+        database.save(order);
+    }
+}
+    </pre>
+
+    <p><strong>Why this is wrong:</strong></p>
+    <ul>
+        <li>OrderService is tightly coupled to MySQL</li>
+        <li>Switching to MongoDB requires code changes</li>
+        <li>Hard to write unit tests</li>
+        <li>Violates DIP</li>
+    </ul>
+
+    <h2>4. DIP Compliant Design (Correct Way)</h2>
+
+    <div class="good">
+        <strong>Solution:</strong> Depend on abstractions
+    </div>
+
+    <h3>Step 1: Create an Abstraction</h3>
+    <pre>
+interface Database {
+    void save(String data);
+}
+    </pre>
+
+    <h3>Step 2: Implement the Abstraction</h3>
+    <pre>
+class MySQLDatabase implements Database {
+    public void save(String data) {
+        // save to MySQL
+    }
+}
+
+class MongoDatabase implements Database {
+    public void save(String data) {
+        // save to MongoDB
+    }
+}
+    </pre>
+
+    <h3>Step 3: Inject the Dependency</h3>
+    <pre>
+class OrderService {
+
+    private Database database;
+
+    public OrderService(Database database) {
+        this.database = database;
+    }
+
+    public void placeOrder(String order) {
+        database.save(order);
+    }
+}
+    </pre>
+
+    <p>
+        Now OrderService does not care whether data is saved to MySQL,
+        MongoDB, or any other database.
+    </p>
+
+    <h2>5. DIP vs Dependency Injection (Important)</h2>
+
+    <ul>
+        <li><strong>DIP</strong> → Design principle (what to do)</li>
+        <li><strong>DI</strong> → Technique (how to do it)</li>
+    </ul>
+
+    <p>
+        Frameworks like Spring implement <strong>Dependency Injection</strong>
+        to help you follow <strong>DIP</strong>.
+    </p>
+
+    <h2>6. DIP in Spring Boot (Real-World Example)</h2>
+
+    <pre>
+public interface PaymentGateway {
+    void pay();
+}
+    </pre>
+
+    <pre>
+@Service
+public class RazorpayGateway implements PaymentGateway {
+    public void pay() {}
+}
+
+@Service
+public class StripeGateway implements PaymentGateway {
+    public void pay() {}
+}
+    </pre>
+
+    <pre>
+@Service
+public class PaymentService {
+
+    private final PaymentGateway gateway;
+
+    public PaymentService(PaymentGateway gateway) {
+        this.gateway = gateway;
+    }
+}
+    </pre>
+
+    <p>
+        Spring injects the correct implementation at runtime.
+        Business logic remains unchanged.
+    </p>
+
+    <h2>7. Common Mistakes with DIP</h2>
+
+    <ul>
+        <li>Depending directly on concrete classes</li>
+        <li>Confusing DIP with simply “using interfaces”</li>
+        <li>Creating abstractions too late</li>
+        <li>Hardcoding dependencies using <code>new</code></li>
+    </ul>
+
+    <div class="note">
+        <strong>Rule of thumb:</strong><br>
+        High-level policy should never know low-level details.
+    </div>
+
+    <h2>8. Interview-Ready Summary</h2>
+
+    <p>
+        <strong>
+            The Dependency Inversion Principle ensures that business logic
+            depends on abstractions rather than concrete implementations.
+            This makes systems flexible, testable, and easy to extend.
+        </strong>
+    </p>
+
+    <h2>9. One-Line Memory Hook</h2>
+
+    <p>
+        <strong>“Depend on interfaces, not implementations.”</strong>
+    </p>
+
+</section>
+
+<footer>
+    <p>Dependency Inversion Principle | SOLID Design Principles</p>
+</footer>
+
+</body>
+</html>

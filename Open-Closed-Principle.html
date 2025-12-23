@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Open–Closed Principle (OCP) – Complete Explanation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #111827;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        section {
+            max-width: 1000px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        h1, h2, h3 {
+            color: #111827;
+        }
+
+        h2 {
+            margin-top: 40px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+
+        p {
+            margin: 12px 0;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        code {
+            background: #e5e7eb;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .bad {
+            background: #fee2e2;
+            border-left: 5px solid #dc2626;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .good {
+            background: #dcfce7;
+            border-left: 5px solid #16a34a;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .note {
+            background: #e0f2fe;
+            border-left: 5px solid #0284c7;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #111827;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Open–Closed Principle (OCP)</h1>
+    <p>Detailed Explanation with Examples – Interview Ready</p>
+</header>
+
+<section>
+
+    <h2>1. What is the Open–Closed Principle?</h2>
+    <p>
+        The <strong>Open–Closed Principle</strong> states:
+    </p>
+    <p>
+        <strong>
+            “Software entities (classes, modules, functions) should be open for extension,
+            but closed for modification.”
+        </strong>
+    </p>
+
+    <p>
+        This means you should be able to <strong>add new behavior</strong> to a system
+        without <strong>changing existing, already tested code</strong>.
+    </p>
+
+    <div class="note">
+        <strong>Key idea:</strong><br>
+        If adding a new feature forces you to edit old code → OCP is violated.
+    </div>
+
+    <h2>2. Why OCP is Important</h2>
+    <ul>
+        <li>Reduces regression bugs</li>
+        <li>Protects stable, tested code</li>
+        <li>Makes systems scalable</li>
+        <li>Improves maintainability</li>
+        <li>Supports clean architecture</li>
+    </ul>
+
+    <h2>3. OCP Violation Example (Wrong Design)</h2>
+
+    <div class="bad">
+        <strong>Problem:</strong> Payment processing using if-else logic
+    </div>
+
+    <pre>
+class PaymentService {
+
+    public void pay(String type, double amount) {
+
+        if (type.equals("CARD")) {
+            // card payment logic
+        } else if (type.equals("UPI")) {
+            // upi payment logic
+        } else if (type.equals("NETBANKING")) {
+            // net banking logic
+        }
+    }
+}
+    </pre>
+
+    <p><strong>Problems with this approach:</strong></p>
+    <ul>
+        <li>Every new payment method requires modifying this class</li>
+        <li>Growing if-else chain</li>
+        <li>High risk of bugs</li>
+        <li>Not closed for modification</li>
+    </ul>
+
+    <h2>4. OCP Compliant Design (Correct Way)</h2>
+
+    <div class="good">
+        <strong>Solution:</strong> Use abstraction and polymorphism
+    </div>
+
+    <h3>Step 1: Create an Interface</h3>
+    <pre>
+interface PaymentMethod {
+    void pay(double amount);
+}
+    </pre>
+
+    <h3>Step 2: Create Implementations</h3>
+    <pre>
+class CardPayment implements PaymentMethod {
+    public void pay(double amount) {
+        // card payment logic
+    }
+}
+
+class UPIPayment implements PaymentMethod {
+    public void pay(double amount) {
+        // upi payment logic
+    }
+}
+    </pre>
+
+    <h3>Step 3: High-Level Module Uses Abstraction</h3>
+    <pre>
+class PaymentService {
+
+    private PaymentMethod paymentMethod;
+
+    public PaymentService(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public void process(double amount) {
+        paymentMethod.pay(amount);
+    }
+}
+    </pre>
+
+    <p>
+        Now, adding <code>CryptoPayment</code> or <code>WalletPayment</code>
+        requires <strong>no change</strong> to <code>PaymentService</code>.
+    </p>
+
+    <h2>5. How OCP is Achieved</h2>
+    <ul>
+        <li>Interfaces / Abstract classes</li>
+        <li>Polymorphism</li>
+        <li>Strategy Pattern</li>
+        <li>Factory Pattern</li>
+        <li>Dependency Injection (Spring)</li>
+    </ul>
+
+    <h2>6. OCP in Spring Boot (Real World)</h2>
+    <pre>
+@Service
+public class OrderService {
+
+    private final PaymentGateway gateway;
+
+    public OrderService(PaymentGateway gateway) {
+        this.gateway = gateway;
+    }
+}
+    </pre>
+
+    <p>
+        Spring injects different implementations at runtime.
+        Business logic remains unchanged.
+    </p>
+
+    <h2>7. Common Mistakes with OCP</h2>
+    <ul>
+        <li>Overusing interfaces unnecessarily</li>
+        <li>Creating abstractions when change is unlikely</li>
+        <li>Confusing OCP with “never modify code”</li>
+    </ul>
+
+    <div class="note">
+        <strong>Rule of thumb:</strong><br>
+        Apply OCP where future change is expected.
+    </div>
+
+    <h2>8. Interview-Ready Summary</h2>
+    <p>
+        <strong>
+            The Open–Closed Principle ensures that software can grow without breaking existing functionality.
+            It encourages extension through abstraction rather than modification of existing code.
+        </strong>
+    </p>
+
+    <p>
+        In Java and Spring Boot, OCP is commonly implemented using interfaces,
+        polymorphism, and dependency injection.
+    </p>
+
+    <h2>9. One-Line Memory Hook</h2>
+    <p>
+        <strong>“If adding a feature forces me to change old code, I broke OCP.”</strong>
+    </p>
+
+</section>
+
+<footer>
+    <p>Open–Closed Principle | SOLID Design Principles</p>
+</footer>
+
+</body>
+</html>

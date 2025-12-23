@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Liskov Substitution Principle (LSP) – Complete Explanation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #111827;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        section {
+            max-width: 1000px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        h1, h2, h3 {
+            color: #111827;
+        }
+
+        h2 {
+            margin-top: 40px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+
+        p {
+            margin: 12px 0;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        code {
+            background: #e5e7eb;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .bad {
+            background: #fee2e2;
+            border-left: 5px solid #dc2626;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .good {
+            background: #dcfce7;
+            border-left: 5px solid #16a34a;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .note {
+            background: #e0f2fe;
+            border-left: 5px solid #0284c7;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #111827;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Liskov Substitution Principle (LSP)</h1>
+    <p>Detailed Explanation with Examples – Interview Ready</p>
+</header>
+
+<section>
+
+    <h2>1. What is the Liskov Substitution Principle?</h2>
+
+    <p>
+        The <strong>Liskov Substitution Principle (LSP)</strong> states:
+    </p>
+
+    <p>
+        <strong>
+            “Objects of a superclass should be replaceable with objects of its subclasses
+            without breaking the application.”
+        </strong>
+    </p>
+
+    <p>
+        In simple terms, if class <code>B</code> is a subclass of class <code>A</code>,
+        then <code>B</code> must behave exactly like <code>A</code> wherever <code>A</code> is used.
+    </p>
+
+    <div class="note">
+        <strong>Key idea:</strong><br>
+        If replacing a parent object with a child object changes behavior → LSP is violated.
+    </div>
+
+    <h2>2. Why LSP is Important</h2>
+
+    <ul>
+        <li>Ensures reliable polymorphism</li>
+        <li>Prevents unexpected runtime behavior</li>
+        <li>Makes inheritance safe</li>
+        <li>Improves testability</li>
+        <li>Supports clean object-oriented design</li>
+    </ul>
+
+    <h2>3. Classic LSP Violation (Rectangle–Square Problem)</h2>
+
+    <div class="bad">
+        <strong>Problem:</strong> Square extends Rectangle
+    </div>
+
+    <pre>
+class Rectangle {
+    protected int width;
+    protected int height;
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getArea() {
+        return width * height;
+    }
+}
+    </pre>
+
+    <pre>
+class Square extends Rectangle {
+
+    @Override
+    public void setWidth(int width) {
+        this.width = width;
+        this.height = width;
+    }
+
+    @Override
+    public void setHeight(int height) {
+        this.height = height;
+        this.width = height;
+    }
+}
+    </pre>
+
+    <p><strong>Why this breaks LSP:</strong></p>
+    <ul>
+        <li>Rectangle allows width and height to change independently</li>
+        <li>Square forces width = height</li>
+        <li>Methods expecting Rectangle get unexpected behavior</li>
+        <li>Subclass changes the contract of the parent</li>
+    </ul>
+
+    <h2>4. LSP Compliant Design (Correct Way)</h2>
+
+    <div class="good">
+        <strong>Solution:</strong> Avoid incorrect inheritance
+    </div>
+
+    <h3>Use a Common Abstraction</h3>
+    <pre>
+interface Shape {
+    int getArea();
+}
+    </pre>
+
+    <pre>
+class Rectangle implements Shape {
+    private int width;
+    private int height;
+
+    public Rectangle(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public int getArea() {
+        return width * height;
+    }
+}
+    </pre>
+
+    <pre>
+class Square implements Shape {
+    private int side;
+
+    public Square(int side) {
+        this.side = side;
+    }
+
+    public int getArea() {
+        return side * side;
+    }
+}
+    </pre>
+
+    <p>
+        Both classes now follow the same contract without breaking expectations.
+    </p>
+
+    <h2>5. Real-World LSP Violation Example</h2>
+
+    <div class="bad">
+        <strong>Example:</strong> Bird → Penguin
+    </div>
+
+    <pre>
+class Bird {
+    public void fly() {
+        // flying logic
+    }
+}
+
+class Penguin extends Bird {
+    @Override
+    public void fly() {
+        throw new UnsupportedOperationException("Penguins cannot fly");
+    }
+}
+    </pre>
+
+    <p>
+        Penguin cannot substitute Bird safely because it breaks expected behavior.
+    </p>
+
+    <h2>6. Correct Design for Bird Example</h2>
+
+    <div class="good">
+        <strong>Solution:</strong> Separate behaviors
+    </div>
+
+    <pre>
+interface Bird {
+    void eat();
+}
+
+interface FlyingBird extends Bird {
+    void fly();
+}
+    </pre>
+
+    <pre>
+class Sparrow implements FlyingBird {
+    public void eat() {}
+    public void fly() {}
+}
+
+class Penguin implements Bird {
+    public void eat() {}
+}
+    </pre>
+
+    <h2>7. LSP in Spring Boot (Practical View)</h2>
+
+    <pre>
+public interface PaymentService {
+    void pay();
+}
+    </pre>
+
+    <pre>
+@Service
+public class UPIPaymentService implements PaymentService {
+    public void pay() {
+        // upi logic
+    }
+}
+
+@Service
+public class CardPaymentService implements PaymentService {
+    public void pay() {
+        // card logic
+    }
+}
+    </pre>
+
+    <p>
+        Any implementation can replace another without breaking behavior.
+        Spring’s dependency injection relies heavily on LSP.
+    </p>
+
+    <h2>8. Common Mistakes with LSP</h2>
+
+    <ul>
+        <li>Using inheritance just to reuse code</li>
+        <li>Throwing unsupported exceptions in subclasses</li>
+        <li>Strengthening preconditions in child classes</li>
+        <li>Weakening postconditions</li>
+    </ul>
+
+    <div class="note">
+        <strong>Rule of thumb:</strong><br>
+        If a subclass surprises the caller → inheritance is wrong.
+    </div>
+
+    <h2>9. Interview-Ready Summary</h2>
+
+    <p>
+        <strong>
+            The Liskov Substitution Principle ensures that subclasses remain true to the
+            behavior promised by their parent classes. If a subclass cannot honor that
+            contract, inheritance should be avoided.
+        </strong>
+    </p>
+
+    <h2>10. One-Line Memory Hook</h2>
+
+    <p>
+        <strong>“If the child cannot fully behave like the parent, don’t use inheritance.”</strong>
+    </p>
+
+</section>
+
+<footer>
+    <p>Liskov Substitution Principle | SOLID Design Principles</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Single Responsibility Principle (SRP) – Complete Explanation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #111827;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        section {
+            max-width: 1000px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        h1, h2, h3 {
+            color: #111827;
+        }
+
+        h2 {
+            margin-top: 40px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+
+        p {
+            margin: 12px 0;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        code {
+            background: #e5e7eb;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .bad {
+            background: #fee2e2;
+            border-left: 5px solid #dc2626;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .good {
+            background: #dcfce7;
+            border-left: 5px solid #16a34a;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .note {
+            background: #e0f2fe;
+            border-left: 5px solid #0284c7;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #111827;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Single Responsibility Principle (SRP)</h1>
+    <p>Detailed Explanation with Examples – Interview Ready</p>
+</header>
+
+<section>
+
+    <h2>1. What is the Single Responsibility Principle?</h2>
+
+    <p>
+        The <strong>Single Responsibility Principle (SRP)</strong> states:
+    </p>
+
+    <p>
+        <strong>
+            “A class should have only one reason to change.”
+        </strong>
+    </p>
+
+    <p>
+        This means a class should have <strong>only one responsibility</strong>,
+        or in simple words, <strong>one job</strong>.
+    </p>
+
+    <div class="note">
+        <strong>Key idea:</strong><br>
+        If a class changes for more than one reason → SRP is violated.
+    </div>
+
+    <h2>2. Why SRP is Important</h2>
+
+    <ul>
+        <li>Improves readability and clarity</li>
+        <li>Reduces side effects when changing code</li>
+        <li>Makes testing easier</li>
+        <li>Improves maintainability</li>
+        <li>Encourages clean architecture</li>
+    </ul>
+
+    <h2>3. SRP Violation Example (Wrong Design)</h2>
+
+    <div class="bad">
+        <strong>Problem:</strong> One class handling multiple responsibilities
+    </div>
+
+    <pre>
+class UserService {
+
+    public void registerUser() {
+        // user registration logic
+    }
+
+    public void sendWelcomeEmail() {
+        // email sending logic
+    }
+
+    public void logActivity() {
+        // logging logic
+    }
+}
+    </pre>
+
+    <p><strong>What’s wrong here?</strong></p>
+    <ul>
+        <li>User registration logic changes → class changes</li>
+        <li>Email logic changes → same class changes</li>
+        <li>Logging changes → same class changes</li>
+        <li>Multiple reasons to change → SRP violation</li>
+    </ul>
+
+    <h2>4. SRP Compliant Design (Correct Way)</h2>
+
+    <div class="good">
+        <strong>Solution:</strong> Split responsibilities into separate classes
+    </div>
+
+    <h3>User Registration Responsibility</h3>
+    <pre>
+class UserService {
+
+    public void registerUser() {
+        // user registration logic
+    }
+}
+    </pre>
+
+    <h3>Email Responsibility</h3>
+    <pre>
+class EmailService {
+
+    public void sendWelcomeEmail() {
+        // email sending logic
+    }
+}
+    </pre>
+
+    <h3>Logging Responsibility</h3>
+    <pre>
+class AuditLogger {
+
+    public void logActivity() {
+        // logging logic
+    }
+}
+    </pre>
+
+    <p>
+        Each class now has <strong>only one responsibility</strong>
+        and <strong>one reason to change</strong>.
+    </p>
+
+    <h2>5. How SRP Helps in Real Projects</h2>
+
+    <ul>
+        <li>Changes are localized</li>
+        <li>Bug fixing becomes safer</li>
+        <li>Classes remain small and focused</li>
+        <li>Code reviews become easier</li>
+    </ul>
+
+    <h2>6. SRP in Spring Boot (Real-World Example)</h2>
+
+    <pre>
+@Service
+public class OrderService {
+    public void createOrder() {
+        // order creation logic
+    }
+}
+
+@Service
+public class NotificationService {
+    public void notifyUser() {
+        // send notification
+    }
+}
+
+@Service
+public class PaymentService {
+    public void processPayment() {
+        // payment logic
+    }
+}
+    </pre>
+
+    <p>
+        Each service handles a single responsibility.
+        This is how SRP appears in clean Spring Boot applications.
+    </p>
+
+    <h2>7. Common Mistakes with SRP</h2>
+
+    <ul>
+        <li>God classes doing everything</li>
+        <li>Mixing business logic with infrastructure logic</li>
+        <li>Combining validation, persistence, and communication</li>
+    </ul>
+
+    <div class="note">
+        <strong>Rule of thumb:</strong><br>
+        If a class description needs the word “and”, it violates SRP.
+    </div>
+
+    <h2>8. Interview-Ready Summary</h2>
+
+    <p>
+        <strong>
+            The Single Responsibility Principle ensures that a class focuses on one task only.
+            This reduces coupling, improves maintainability, and makes systems easier to understand.
+        </strong>
+    </p>
+
+    <h2>9. One-Line Memory Hook</h2>
+
+    <p>
+        <strong>“One class, one job, one reason to change.”</strong>
+    </p>
+
+</section>
+
+<footer>
+    <p>Single Responsibility Principle | SOLID Design Principles</p>
+</footer>
+
+</body>
+</html>
