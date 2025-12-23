@@ -1,0 +1,82 @@
+🧩 ROUND 1 – Core Java, Spring, DB & DSA
+
+Backend & Java Concepts
+1. What is Spring Boot Actuator and how does it work?
+2. SQL vs NoSQL – differences, advantages & disadvantages.
+3. How to handle concurrency in Java when two threads access the same resource?
+ 4.If two threads access the same integer variable, how do we ensure correctness?
+5. Difference between AtomicInteger and volatile.
+6. Do volatile and atomic types solve the same problem?
+7.Scenario:
+Order is placed → show success
+Send email in background thread
+Save the result later
+ How will you design this with CompletableFuture / Async?
+8. Difference between intermediate, terminal, and short-circuit operations in Streams.
+9. Using Streams, how to find the sum of a list?
+10. Why do we make a constructor private?
+11. How can a Singleton be broken (reflection, clone, serialization)?
+12. RestTemplate vs WebClient – differences & which one to use?
+13. Constructor vs Setter Injection – pros & cons.
+14. If an interface has 2 implementations (e.g., payment gateways), how to choose a default implementation?
+15. Difference between @Component and @Configuration.
+16. How to implement OAuth in Spring?
+17. JWT vs OAuth – differences.
+18. How to detect memory leak or GC issues (heap dump, GC logs, profiling tools)?
+19. Coding: First non-repeating character in a string.
+20. Coding: Find duplicate number using Floyd’s Cycle Detection.
+21. What is CSRF? How to enable CSRF protection in Spring?
+
+ 
+💡 Takeaway
+It was a great learning experience. The interview clearly highlighted the areas I need to strengthen—especially LLD patterns, API design, and a deeper understanding of scalable backend systems.
+Truly grateful for the opportunity and appreciate the time and effort the interviewers put into the whole process. 🙌
+
+
+
+🧩 ROUND 2 – Spring Boot Deep Dive (Multipart, Concurrency, Locking, JVM, Design)
+
+Spring Boot – REST Controller Design
+1. How do you design APIs for file upload?
+2. What file format is stored in the database?
+
+Spring Boot – Multipart Handling
+3. What is MultipartFile?
+4. What is a boundary in multipart requests & why do we need it?
+5. Do we need StringBuffer or filters to handle multipart requests?
+
+Spring Boot – Concurrency & Synchronization
+6. If two maps are accessed, should we use two separate synchronized blocks?
+7. What is a Lock in Java?
+8. How do you safely unlock without blocking other threads?
+9. What is volatile?
+10. Can volatile alone give thread-safety?
+
+Spring Boot – Hashing & Equality
+11. Why override hashCode() when overriding equals()?
+12. Why must equal objects have the same hashcode?
+13. Student(id, name) → Can two students with same name be equal?
+
+Spring Boot – JVM & Memory
+14. What is garbage collection, heap, Xmx, Xms?
+15. How do JVM arguments affect performance?
+
+Spring Boot – DSA
+16. First non-repeating character (example: “Swiss”).
+17. How to design an LRU Cache?
+
+Spring Boot – Design Patterns
+18. Why is constructor private?
+19. How is Singleton object created if constructor is private?
+
+Threading Concepts
+20. Create a deadlock using two threads.
+21. What is a ThreadPool?
+
+Streams vs Loops
+22. Why Streams can be faster and when loops are better?
+
+💡 Takeaway
+It was a great learning experience. The interview clearly highlighted the areas I need to strengthen—especially LLD patterns, API design, and a deeper understanding of scalable backend systems.
+
+Truly grateful for the opportunity and appreciate the time and effort the interviewers put into the whole process. 

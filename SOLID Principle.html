@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOLID Principles – Complete Interview Guide</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+      margin: 40px;
+      color: #222;
+    }
+    h1, h2, h3 {
+      color: #1f2937;
+    }
+    section {
+      page-break-after: always;
+      margin-bottom: 60px;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 10px;
+      display: block;
+      border-left: 4px solid #4f46e5;
+      margin: 12px 0;
+      white-space: pre-wrap;
+    }
+    ul {
+      margin-left: 20px;
+    }
+    .summary {
+      background: #eef2ff;
+      padding: 15px;
+      border-left: 5px solid #4f46e5;
+      margin-top: 20px;
+    }
+    .note {
+      background: #ecfeff;
+      padding: 12px;
+      border-left: 5px solid #06b6d4;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>SOLID Principles – Complete Interview & Practical Guide</h1>
+<p>This document explains all five SOLID principles with clear reasoning, bad vs good examples, and interview-ready summaries.</p>
+
+<!-- ================= SRP ================= -->
+<section>
+  <h2>1. Single Responsibility Principle (SRP)</h2>
+
+  <h3>Definition</h3>
+  <p>A class should have only one reason to change — it should do only one job.</p>
+
+  <h3>Why SRP Exists</h3>
+  <ul>
+    <li>Reduces complexity</li>
+    <li>Makes testing easier</li>
+    <li>Limits impact of change</li>
+  </ul>
+
+  <h3>Violation Example</h3>
+  <code>
+class UserService {
+    void login() {}
+    void sendEmail() {}
+    void generateReport() {}
+}
+  </code>
+
+  <h3>Correct Design</h3>
+  <code>
+class AuthService { void login() {} }
+class EmailService { void sendEmail() {} }
+class ReportService { void generateReport() {} }
+  </code>
+
+  <div class="summary">
+    <strong>Interview Summary:</strong> SRP keeps classes focused and reduces the risk of breaking unrelated behavior.
+  </div>
+</section>
+
+<!-- ================= OCP ================= -->
+<section>
+  <h2>2. Open–Closed Principle (OCP)</h2>
+
+  <h3>Definition</h3>
+  <p>Software entities should be open for extension but closed for modification.</p>
+
+  <h3>Why OCP Exists</h3>
+  <ul>
+    <li>Prevents regression bugs</li>
+    <li>Protects stable code</li>
+    <li>Enables safe feature growth</li>
+  </ul>
+
+  <h3>Violation Example</h3>
+  <code>
+class PaymentService {
+    void pay(String type) {
+        if (type.equals("CARD")) {}
+        else if (type.equals("UPI")) {}
+    }
+}
+  </code>
+
+  <h3>Correct Design</h3>
+  <code>
+interface PaymentMethod { void pay(); }
+
+class CardPayment implements PaymentMethod {
+    public void pay() {}
+}
+
+class UPIPayment implements PaymentMethod {
+    public void pay() {}
+}
+  </code>
+
+  <div class="summary">
+    <strong>Interview Summary:</strong> New behavior should be added by extending the system, not by changing existing code.
+  </div>
+</section>
+
+<!-- ================= LSP ================= -->
+<section>
+  <h2>3. Liskov Substitution Principle (LSP)</h2>
+
+  <h3>Definition</h3>
+  <p>Subclasses must be substitutable for their base classes without breaking behavior.</p>
+
+  <h3>Why LSP Exists</h3>
+  <ul>
+    <li>Ensures safe polymorphism</li>
+    <li>Avoids unexpected side effects</li>
+  </ul>
+
+  <h3>Violation Example</h3>
+  <code>
+class Rectangle {
+    void setWidth(int w) {}
+    void setHeight(int h) {}
+}
+
+class Square extends Rectangle {
+    // Forces width = height
+}
+  </code>
+
+  <h3>Correct Design</h3>
+  <code>
+interface Shape { int area(); }
+
+class Rectangle implements Shape {
+    public int area() { return 0; }
+}
+
+class Square implements Shape {
+    public int area() { return 0; }
+}
+  </code>
+
+  <div class="summary">
+    <strong>Interview Summary:</strong> If a child class changes expected parent behavior, LSP is violated.
+  </div>
+</section>
+
+<!-- ================= ISP ================= -->
+<section>
+  <h2>4. Interface Segregation Principle (ISP)</h2>
+
+  <h3>Definition</h3>
+  <p>Clients should not be forced to depend on interfaces they do not use.</p>
+
+  <h3>Why ISP Exists</h3>
+  <ul>
+    <li>Avoids empty method implementations</li>
+    <li>Improves flexibility</li>
+    <li>Reduces ripple effects of change</li>
+  </ul>
+
+  <h3>Violation Example</h3>
+  <code>
+interface Machine {
+    void print();
+    void scan();
+    void fax();
+}
+  </code>
+
+  <h3>Correct Design</h3>
+  <code>
+interface Printer { void print(); }
+interface Scanner { void scan(); }
+interface Fax { void fax(); }
+  </code>
+
+  <div class="summary">
+    <strong>Interview Summary:</strong> Prefer small, focused interfaces over large, generic ones.
+  </div>
+</section>
+
+<!-- ================= DIP ================= -->
+<section>
+  <h2>5. Dependency Inversion Principle (DIP)</h2>
+
+  <h3>Definition</h3>
+  <p>High-level modules should not depend on low-level modules; both should depend on abstractions.</p>
+
+  <h3>Why DIP Exists</h3>
+  <ul>
+    <li>Reduces tight coupling</li>
+    <li>Improves testability</li>
+    <li>Makes implementations replaceable</li>
+  </ul>
+
+  <h3>Violation Example</h3>
+  <code>
+class OrderService {
+    MySQLDatabase db = new MySQLDatabase();
+}
+  </code>
+
+  <h3>Correct Design</h3>
+  <code>
+interface Database {}
+
+class MySQLDatabase implements Database {}
+
+class OrderService {
+    Database db;
+}
+  </code>
+
+  <div class="summary">
+    <strong>Interview Summary:</strong> Depend on interfaces, not concrete classes. Dependency Injection implements DIP.
+  </div>
+</section>
+
+<h2>Final One-Line SOLID Summary</h2>
+<ul>
+  <li><strong>SRP:</strong> One class → one responsibility</li>
+  <li><strong>OCP:</strong> Extend, don’t modify</li>
+  <li><strong>LSP:</strong> Child must fully behave like parent</li>
+  <li><strong>ISP:</strong> No forced unused methods</li>
+  <li><strong>DIP:</strong> Depend on abstractions</li>
+</ul>
+
+</body>
+</html>
