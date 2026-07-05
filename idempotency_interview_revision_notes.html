@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Idempotency Interview Revision Notes</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #dbe2ef;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --green: #16a34a;
+      --green-light: #dcfce7;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+      --yellow: #ca8a04;
+      --yellow-light: #fef9c3;
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+      --code-bg: #111827;
+      --code-text: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+      color: white;
+      padding: 34px;
+      border-radius: 22px;
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.25);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: 18px;
+      opacity: 0.95;
+    }
+
+    .tag-row {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(31, 41, 55, 0.06);
+    }
+
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 22px;
+      color: #111827;
+    }
+
+    h3 {
+      margin: 18px 0 8px;
+      font-size: 17px;
+      color: #111827;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 7px;
+    }
+
+    .one-line {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-light);
+      border-left: 6px solid var(--accent);
+      padding: 16px 18px;
+      border-radius: 14px;
+      margin-top: 12px;
+    }
+
+    .mindmap {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .node {
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 15px;
+      background: #fff;
+      min-height: 118px;
+    }
+
+    .node strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 7px;
+      color: #111827;
+    }
+
+    .node.center {
+      grid-column: span 3;
+      text-align: center;
+      background: var(--accent-light);
+      border-color: var(--accent);
+      min-height: auto;
+    }
+
+    .node.center strong {
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    .node small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .green {
+      background: var(--green-light);
+      border-color: var(--green);
+    }
+
+    .red {
+      background: var(--red-light);
+      border-color: var(--red);
+    }
+
+    .yellow {
+      background: var(--yellow-light);
+      border-color: var(--yellow);
+    }
+
+    .purple {
+      background: var(--purple-light);
+      border-color: var(--purple);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef2ff;
+      color: #111827;
+    }
+
+    .yes {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .no {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .depends {
+      color: var(--yellow);
+      font-weight: 800;
+    }
+
+    .code {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 15px;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 14px;
+      margin-top: 12px;
+      white-space: pre-wrap;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 13px;
+      border-radius: 14px;
+    }
+
+    .num {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+    }
+
+    .qa {
+      border-left: 5px solid var(--purple);
+      background: var(--purple-light);
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-top: 12px;
+    }
+
+    .qa b {
+      color: #4c1d95;
+    }
+
+    .memory-box {
+      background: #ecfdf5;
+      border: 2px dashed var(--green);
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .mini-card {
+      padding: 15px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+    }
+
+    .print-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .page {
+        max-width: 100%;
+        padding: 0;
+      }
+
+      .card, .hero {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      .hero {
+        color: #111827;
+        background: #eef2ff;
+      }
+
+      .tag {
+        color: #111827;
+        border-color: #c7d2fe;
+      }
+    }
+
+    @media (max-width: 850px) {
+      .span-8, .span-6, .span-4 {
+        grid-column: span 12;
+      }
+
+      .mindmap {
+        grid-template-columns: 1fr;
+      }
+
+      .node.center {
+        grid-column: span 1;
+      }
+
+      .compare {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>Idempotency — Interview Revision Notes</h1>
+      <p>Quick memory map for REST API, Microservices, Payments, Kafka, and Retry handling.</p>
+      <div class="tag-row">
+        <span class="tag">REST API</span>
+        <span class="tag">HTTP Methods</span>
+        <span class="tag">Microservices</span>
+        <span class="tag">Kafka</span>
+        <span class="tag">Payment API</span>
+        <span class="tag">Retry Safety</span>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-12">
+        <h2>1. One-Line Definition</h2>
+        <p><b>Idempotency</b> means performing the same operation multiple times should produce the same final result as performing it once.</p>
+        <div class="one-line">Same request repeated → Same final state → No duplicate side effect</div>
+      </div>
+
+      <div class="card span-12">
+        <h2>2. Mind Map</h2>
+        <div class="mindmap">
+          <div class="node center">
+            <strong>IDEMPOTENCY</strong>
+            <small>Retry-safe operation</small>
+          </div>
+
+          <div class="node green">
+            <strong>Meaning</strong>
+            Same request multiple times gives same final result.
+          </div>
+
+          <div class="node yellow">
+            <strong>Why Needed?</strong>
+            Network timeout, double click, retry, server crash, message redelivery.
+          </div>
+
+          <div class="node purple">
+            <strong>Where Used?</strong>
+            REST API, Microservices, Payments, Kafka, Queues, Distributed Systems.
+          </div>
+
+          <div class="node green">
+            <strong>HTTP Methods</strong>
+            GET, PUT, DELETE are idempotent. POST is usually not.
+          </div>
+
+          <div class="node red">
+            <strong>Problem</strong>
+            Duplicate order, duplicate payment, duplicate invoice, duplicate DB insert.
+          </div>
+
+          <div class="node yellow">
+            <strong>Solution</strong>
+            Idempotency key, eventId, request hash, unique DB constraint, Redis/DB storage.
+          </div>
+        </div>
+      </div>
+
+      <div class="card span-8">
+        <h2>3. HTTP Methods Revision</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Idempotent?</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>GET</b></td>
+              <td class="yes">Yes</td>
+              <td>Only reads data. Repeating it does not change server state.</td>
+            </tr>
+            <tr>
+              <td><b>PUT</b></td>
+              <td class="yes">Yes</td>
+              <td>Updates/replaces resource to a fixed final state.</td>
+            </tr>
+            <tr>
+              <td><b>DELETE</b></td>
+              <td class="yes">Yes</td>
+              <td>After first delete, resource is gone. Repeated calls keep it gone.</td>
+            </tr>
+            <tr>
+              <td><b>POST</b></td>
+              <td class="no">No</td>
+              <td>Usually creates a new resource every time.</td>
+            </tr>
+            <tr>
+              <td><b>PATCH</b></td>
+              <td class="depends">Depends</td>
+              <td>Setting city=Pune is idempotent. incrementBalanceBy=100 is not.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card span-4">
+        <h2>4. Memory Trick</h2>
+        <div class="memory-box">
+          GPD are idempotent:
+          <br><br>
+          G = GET<br>
+          P = PUT<br>
+          D = DELETE
+        </div>
+        <p class="print-note">POST is not idempotent by default. PATCH depends on implementation.</p>
+      </div>
+
+      <div class="card span-6">
+        <h2>5. Safe vs Idempotent</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Safe</b></td>
+              <td>Does not modify server data.</td>
+            </tr>
+            <tr>
+              <td><b>Idempotent</b></td>
+              <td>Repeated calls produce same final state.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="qa">
+          <b>Important:</b> All safe methods are idempotent, but all idempotent methods are not safe.
+        </div>
+      </div>
+
+      <div class="card span-6">
+        <h2>6. Simple Examples</h2>
+        <div class="compare">
+          <div class="mini-card">
+            <h3>Idempotent</h3>
+            <div class="code">PUT /users/101
+{
+  "name": "Rahul"
+}</div>
+            <p>Call 1 time or 5 times, final name remains Rahul.</p>
+          </div>
+          <div class="mini-card">
+            <h3>Not Idempotent</h3>
+            <div class="code">POST /orders
+{
+  "productId": 10
+}</div>
+            <p>Call 5 times, 5 new orders may get created.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card span-12">
+        <h2>7. Idempotency Key</h2>
+        <p>An <b>Idempotency Key</b> is a unique key sent by the client to identify one unique operation.</p>
+        <div class="code">POST /payments
+Idempotency-Key: PAY_ORD_1001
+
+{
+  "orderId": "ORD1001",
+  "amount": 500
+}</div>
+
+        <div class="flow">
+          <div class="step"><span class="num">1</span><div>Client sends request with <b>Idempotency-Key</b>.</div></div>
+          <div class="step"><span class="num">2</span><div>Server checks whether this key already exists in DB/Redis.</div></div>
+          <div class="step"><span class="num">3</span><div>If key does not exist, server processes the request and stores the response.</div></div>
+          <div class="step"><span class="num">4</span><div>If same key comes again, server does not process again.</div></div>
+          <div class="step"><span class="num">5</span><div>Server returns the previous saved response.</div></div>
+        </div>
+      </div>
+
+      <div class="card span-6">
+        <h2>8. What to Store?</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>idempotency_key</td>
+              <td>Unique request identifier</td>
+            </tr>
+            <tr>
+              <td>request_hash</td>
+              <td>Prevents same key being reused with different request body</td>
+            </tr>
+            <tr>
+              <td>status</td>
+              <td>PROCESSING, SUCCESS, FAILED</td>
+            </tr>
+            <tr>
+              <td>response_body</td>
+              <td>Return same response for duplicate request</td>
+            </tr>
+            <tr>
+              <td>created_at</td>
+              <td>Used for expiry/cleanup</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card span-6">
+        <h2>9. Request Hash Rule</h2>
+        <div class="qa">
+          <b>Same key + same body</b><br>
+          Return old response.
+        </div>
+        <div class="qa">
+          <b>Same key + different body</b><br>
+          Reject request because same key is being misused.
+        </div>
+        <div class="code">Idempotency-Key: abc-123
+
+First body:  amount = 500
+Second body: amount = 1000
+
+Result: Error / Conflict</div>
+      </div>
+
+      <div class="card span-6">
+        <h2>10. Payment API Example</h2>
+        <p><b>Problem:</b> Payment is successful, but response timeout happens. Client retries.</p>
+        <ul>
+          <li>Without idempotency: amount may be deducted twice.</li>
+          <li>With idempotency: amount is deducted only once.</li>
+          <li>Retry returns old successful response.</li>
+        </ul>
+        <div class="code">Order Service → Payment Service
+
+Same Idempotency-Key: PAY_ORD_1001
+
+First call  → process payment
+Retry call  → return old response</div>
+      </div>
+
+      <div class="card span-6">
+        <h2>11. Kafka / Queue Example</h2>
+        <p>Kafka usually provides <b>at-least-once delivery</b>, so the same message can be consumed more than once.</p>
+        <div class="code">Message:
+{
+  "eventId": "EVT1001",
+  "orderId": "ORD1001",
+  "status": "PAID"
+}</div>
+        <ul>
+          <li>If eventId already processed → skip.</li>
+          <li>If eventId not processed → process and save eventId.</li>
+          <li>This is called an <b>Idempotent Consumer</b>.</li>
+        </ul>
+      </div>
+
+      <div class="card span-12">
+        <h2>12. Idempotency vs Related Concepts</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Meaning</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Idempotency</b></td>
+              <td>Same request repeated should have same final result.</td>
+              <td>Same payment retry should not deduct twice.</td>
+            </tr>
+            <tr>
+              <td><b>Retry</b></td>
+              <td>Calling operation again after timeout/failure.</td>
+              <td>Order service retries payment call.</td>
+            </tr>
+            <tr>
+              <td><b>Deduplication</b></td>
+              <td>Detect duplicate request/message and ignore it.</td>
+              <td>Skip already processed eventId.</td>
+            </tr>
+            <tr>
+              <td><b>Concurrency</b></td>
+              <td>Multiple requests at the same time.</td>
+              <td>Two users booking same seat.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card span-6">
+        <h2>13. Implementation Options</h2>
+        <ul>
+          <li><b>Idempotency Key:</b> best for POST APIs like payment/order creation.</li>
+          <li><b>Unique DB constraint:</b> prevents duplicate row for same orderId/eventId.</li>
+          <li><b>Processed event table:</b> best for Kafka consumers.</li>
+          <li><b>Redis:</b> useful for fast temporary key storage.</li>
+          <li><b>Request hash:</b> validates same key is used for same request body.</li>
+        </ul>
+      </div>
+
+      <div class="card span-6">
+        <h2>14. Common Mistakes</h2>
+        <ul>
+          <li>Thinking idempotency means same response every time. Actually, same final state matters.</li>
+          <li>Thinking DELETE is not idempotent because second call may return 404.</li>
+          <li>Making payment POST API without idempotency key.</li>
+          <li>Not adding unique constraint on idempotency key/eventId.</li>
+          <li>Not handling PROCESSING state for duplicate in-flight requests.</li>
+        </ul>
+      </div>
+
+      <div class="card span-12">
+        <h2>15. Best Interview Answer</h2>
+        <div class="qa">
+          <b>Answer:</b><br>
+          Idempotency means executing the same operation multiple times should have the same final result as executing it once. It is very important in REST APIs, microservices, payments, and Kafka because retries can happen due to network timeout or service failure. GET, PUT, and DELETE are idempotent by nature. POST is usually not idempotent, but we can make it idempotent using an Idempotency-Key. For Kafka consumers, we can store processed event IDs to avoid duplicate message processing.
+        </div>
+      </div>
+
+      <div class="card span-12">
+        <h2>16. Quick Interview Questions</h2>
+
+        <h3>Q1. What is idempotency?</h3>
+        <p>Same request repeated multiple times should produce the same final result as one request.</p>
+
+        <h3>Q2. Which HTTP methods are idempotent?</h3>
+        <p>GET, PUT, DELETE. PATCH depends. POST is usually not idempotent.</p>
+
+        <h3>Q3. Is DELETE idempotent?</h3>
+        <p>Yes. First call may delete resource. Second call may return 404, but final state is same: resource does not exist.</p>
+
+        <h3>Q4. How to make POST idempotent?</h3>
+        <p>Use Idempotency-Key and store key, request hash, status, and response in DB/Redis.</p>
+
+        <h3>Q5. How to make Kafka consumer idempotent?</h3>
+        <p>Store processed eventId/messageId. If same event comes again, skip processing.</p>
+      </div>
+
+      <div class="card span-12">
+        <h2>17. Final Memory Lines</h2>
+        <div class="one-line">Idempotency = Retry safe operation</div>
+        <div class="one-line">Duplicate request should not create duplicate effect</div>
+        <div class="one-line">Same request repeated → Same final state</div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
