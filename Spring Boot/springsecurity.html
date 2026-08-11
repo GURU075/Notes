@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spring Security Notes</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1f2937;
+      --soft: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --code: #0b1220;
+      --border: #243041;
+      --shadow: 0 10px 30px rgba(0,0,0,.28);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 48px 0 28px;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(circle at top right, rgba(56,189,248,.15), transparent 28%),
+                  radial-gradient(circle at top left, rgba(34,197,94,.10), transparent 22%);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border: 1px solid rgba(56,189,248,.35);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(56,189,248,.08);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3 { line-height: 1.2; margin: 0 0 14px; }
+    h1 { font-size: clamp(2rem, 3vw, 3rem); }
+    h2 { font-size: 1.7rem; margin-top: 6px; }
+    h3 { font-size: 1.12rem; }
+
+    p { margin: 0 0 14px; color: var(--text); }
+    .sub { color: var(--muted); max-width: 900px; font-size: 1.02rem; }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      margin-top: 28px;
+      align-items: start;
+    }
+
+    .toc, .card {
+      background: rgba(17,24,39,.82);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      padding: 18px;
+    }
+
+    .toc h3 {
+      margin-bottom: 10px;
+      color: white;
+      font-size: 1rem;
+    }
+
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: .95rem;
+      transition: .2s ease;
+    }
+
+    .toc a:hover {
+      background: rgba(56,189,248,.08);
+      color: var(--accent);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+      padding-bottom: 48px;
+    }
+
+    .card {
+      padding: 24px;
+    }
+
+    .card h2 {
+      margin-bottom: 14px;
+      color: #fff;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .mini {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .mini strong {
+      color: #fff;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .step {
+      padding: 12px 16px;
+      background: rgba(56,189,248,.08);
+      color: #e0f2fe;
+      border: 1px solid rgba(56,189,248,.28);
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: .95rem;
+    }
+
+    .arrow {
+      align-self: center;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 0 2px;
+    }
+
+    ul {
+      margin: 10px 0 16px 18px;
+      padding: 0;
+    }
+
+    li { margin-bottom: 8px; }
+
+    code {
+      background: rgba(255,255,255,.07);
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #bfdbfe;
+      font-size: .92em;
+    }
+
+    pre {
+      background: var(--code);
+      color: #dbeafe;
+      padding: 16px;
+      border-radius: 16px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      margin: 14px 0 18px;
+      font-size: .92rem;
+      line-height: 1.55;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: .95rem;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: rgba(56,189,248,.09);
+      color: #fff;
+    }
+
+    .good { color: #86efac; font-weight: 700; }
+    .warn { color: #fcd34d; font-weight: 700; }
+    .danger { color: #fca5a5; font-weight: 700; }
+    .muted { color: var(--muted); }
+
+    .footer-note {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-2);
+      background: rgba(34,197,94,.07);
+      border-radius: 12px;
+      color: #dcfce7;
+    }
+
+    @media (max-width: 960px) {
+      .top-grid {
+        grid-template-columns: 1fr;
+      }
+      .toc {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <div class="badge">Spring Security Study Notes</div>
+      <h1>Spring Security + JWT Notes</h1>
+      <p class="sub">
+        A beginner-friendly but complete notes page to understand Spring Security flow, core classes, JWT authentication,
+        request lifecycle, and how each method fits into the full picture.
+      </p>
+    </div>
+  </header>
+
+  <main class="container top-grid">
+    <aside class="toc">
+      <h3>Contents</h3>
+      <a href="#big-picture">1. Big Picture</a>
+      <a href="#core-terms">2. Authentication vs Authorization</a>
+      <a href="#request-flow">3. Full Request Flow</a>
+      <a href="#components">4. Main Components</a>
+      <a href="#register-flow">5. Register Flow</a>
+      <a href="#login-flow">6. Login Flow</a>
+      <a href="#jwt-flow">7. Protected JWT Flow</a>
+      <a href="#code-meaning">8. Important Methods</a>
+      <a href="#filter-chain">9. SecurityFilterChain</a>
+      <a href="#debugging">10. Common Errors</a>
+      <a href="#summary-table">11. Summary Table</a>
+      <a href="#practice">12. Practice Questions</a>
+    </aside>
+
+    <section class="content">
+      <article class="card" id="big-picture">
+        <h2>1. Big Picture</h2>
+        <p>
+          Spring Security is a system that sits <strong>before your controller</strong> and checks whether the current request
+          should be allowed to continue.
+        </p>
+        <p>
+          It mainly answers 2 questions:
+        </p>
+        <ul>
+          <li><strong>Who are you?</strong> → Authentication</li>
+          <li><strong>Are you allowed to do this?</strong> → Authorization</li>
+        </ul>
+
+        <div class="mini-grid">
+          <div class="mini">
+            <strong>Authentication</strong>
+            Verifies identity. Example: username and password are correct, or JWT token is valid.
+          </div>
+          <div class="mini">
+            <strong>Authorization</strong>
+            Checks permission after identity is known. Example: only ADMIN can access <code>/admin/**</code>.
+          </div>
+          <div class="mini">
+            <strong>SecurityContext</strong>
+            Temporary place where Spring Security stores the currently authenticated user for the current request.
+          </div>
+        </div>
+
+        <div class="footer-note">
+          <strong>Main idea:</strong> Spring Security is easier when you study it as a <strong>request journey</strong>, not as random classes.
+        </div>
+      </article>
+
+      <article class="card" id="core-terms">
+        <h2>2. Authentication vs Authorization</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Concept</th>
+                <th>Question</th>
+                <th>Example</th>
+                <th>When it happens</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Authentication</td>
+                <td>Who are you?</td>
+                <td>Checking username/password or validating JWT</td>
+                <td>First</td>
+              </tr>
+              <tr>
+                <td>Authorization</td>
+                <td>What can you access?</td>
+                <td>Only users with role ADMIN can delete records</td>
+                <td>After authentication</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          A user can be authenticated but still not authorized for some endpoints.
+          Example: logged in successfully, but trying to access an ADMIN-only URL.
+        </p>
+      </article>
+
+      <article class="card" id="request-flow">
+        <h2>3. Full Request Flow</h2>
+        <p>This is the mental model you should remember:</p>
+        <div class="flow">
+          <div class="step">Request comes in</div>
+          <div class="arrow">→</div>
+          <div class="step">Security Filter Chain</div>
+          <div class="arrow">→</div>
+          <div class="step">Authentication check</div>
+          <div class="arrow">→</div>
+          <div class="step">SecurityContext set</div>
+          <div class="arrow">→</div>
+          <div class="step">Authorization check</div>
+          <div class="arrow">→</div>
+          <div class="step">Controller</div>
+          <div class="arrow">→</div>
+          <div class="step">Response</div>
+        </div>
+
+        <h3 style="margin-top:24px;">Simple analogy</h3>
+        <p>
+          Think of your backend like an office building.
+        </p>
+        <ul>
+          <li>The <strong>request</strong> is a person entering the building.</li>
+          <li>The <strong>filters</strong> are the security guards at the entrance.</li>
+          <li><strong>Authentication</strong> checks identity card.</li>
+          <li><strong>Authorization</strong> checks whether that person can enter a restricted room.</li>
+          <li>If everything is correct, the person reaches the <strong>controller</strong>.</li>
+        </ul>
+      </article>
+
+      <article class="card" id="components">
+        <h2>4. Main Components and Their Roles</h2>
+        <div class="mini-grid">
+          <div class="mini">
+            <strong>SecurityFilterChain</strong>
+            Defines security rules: which URLs are public, which require authentication, session policy, filter order, and more.
+          </div>
+          <div class="mini">
+            <strong>AuthenticationManager</strong>
+            Entry point for checking login credentials during username/password login.
+          </div>
+          <div class="mini">
+            <strong>UserDetailsService</strong>
+            Loads user details from the database by username.
+          </div>
+          <div class="mini">
+            <strong>PasswordEncoder</strong>
+            Encodes password during registration and compares passwords during login.
+          </div>
+          <div class="mini">
+            <strong>JwtUtil</strong>
+            Generates JWT, validates JWT, and extracts username from JWT.
+          </div>
+          <div class="mini">
+            <strong>JwtAuthFilter</strong>
+            Runs before controller, reads token from request header, validates it, and sets authentication in SecurityContext.
+          </div>
+          <div class="mini">
+            <strong>SecurityContextHolder</strong>
+            Holds the authenticated user object for the current request.
+          </div>
+          <div class="mini">
+            <strong>UsernamePasswordAuthenticationToken</strong>
+            Authentication object used both during login and after JWT validation.
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="register-flow">
+        <h2>5. Register Flow</h2>
+        <div class="flow">
+          <div class="step">POST /register</div>
+          <div class="arrow">→</div>
+          <div class="step">Controller</div>
+          <div class="arrow">→</div>
+          <div class="step">Service</div>
+          <div class="arrow">→</div>
+          <div class="step">PasswordEncoder.encode()</div>
+          <div class="arrow">→</div>
+          <div class="step">Repository.save()</div>
+          <div class="arrow">→</div>
+          <div class="step">User saved</div>
+        </div>
+
+        <h3 style="margin-top:24px;">Important point</h3>
+        <p>
+          During registration, you <strong>manually call</strong> <code>passwordEncoder.encode(rawPassword)</code> before saving the user.
+          You should never store plain password in the database.
+        </p>
+
+        <pre>// Register logic example
+user.setUsername(request.getUsername());
+user.setPassword(passwordEncoder.encode(request.getPassword()));
+user.setRole("USER");
+userRepository.save(user);</pre>
+      </article>
+
+      <article class="card" id="login-flow">
+        <h2>6. Login Flow</h2>
+        <p>The most important login line is:</p>
+        <pre>authenticationManager.authenticate(
+    new UsernamePasswordAuthenticationToken(username, password)
+);</pre>
+
+        <p>When this line runs, Spring Security does the internal work:</p>
+        <div class="flow">
+          <div class="step">POST /login</div>
+          <div class="arrow">→</div>
+          <div class="step">Controller</div>
+          <div class="arrow">→</div>
+          <div class="step">Service</div>
+          <div class="arrow">→</div>
+          <div class="step">AuthenticationManager</div>
+          <div class="arrow">→</div>
+          <div class="step">UserDetailsService.loadUserByUsername()</div>
+          <div class="arrow">→</div>
+          <div class="step">PasswordEncoder.matches()</div>
+          <div class="arrow">→</div>
+          <div class="step">Success</div>
+          <div class="arrow">→</div>
+          <div class="step">JWT generated</div>
+        </div>
+
+        <h3 style="margin-top:24px;">Most important understanding</h3>
+        <ul>
+          <li>You <strong>call</strong> <code>AuthenticationManager</code>.</li>
+          <li>Spring internally calls <code>UserDetailsService</code>.</li>
+          <li>Spring internally uses <code>PasswordEncoder</code> to compare passwords.</li>
+          <li>If successful, then you create and return JWT.</li>
+        </ul>
+      </article>
+
+      <article class="card" id="jwt-flow">
+        <h2>7. Protected Endpoint Flow with JWT</h2>
+        <p>Client sends token in header:</p>
+        <pre>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...</pre>
+
+        <div class="flow">
+          <div class="step">GET /user/profile</div>
+          <div class="arrow">→</div>
+          <div class="step">JwtAuthFilter</div>
+          <div class="arrow">→</div>
+          <div class="step">Extract token</div>
+          <div class="arrow">→</div>
+          <div class="step">Validate token</div>
+          <div class="arrow">→</div>
+          <div class="step">Extract username</div>
+          <div class="arrow">→</div>
+          <div class="step">Load user from DB</div>
+          <div class="arrow">→</div>
+          <div class="step">Set SecurityContext</div>
+          <div class="arrow">→</div>
+          <div class="step">Controller</div>
+        </div>
+
+        <h3 style="margin-top:24px;">Why SecurityContext matters</h3>
+        <p>
+          After token validation, the filter creates an authentication object and stores it in
+          <code>SecurityContextHolder</code>. This tells Spring Security that the request already has an authenticated user.
+        </p>
+
+        <pre>SecurityContextHolder.getContext().setAuthentication(authenticationToken);</pre>
+      </article>
+
+      <article class="card" id="code-meaning">
+        <h2>8. Important Methods and What They Mean</h2>
+
+        <h3><code>loadUserByUsername(String username)</code></h3>
+        <ul>
+          <li><strong>Who calls it?</strong> Spring Security</li>
+          <li><strong>When?</strong> During login or while rebuilding auth from token</li>
+          <li><strong>Purpose:</strong> Fetch user from DB and convert it to <code>UserDetails</code></li>
+        </ul>
+
+        <h3><code>passwordEncoder.encode(password)</code></h3>
+        <ul>
+          <li><strong>When?</strong> During registration</li>
+          <li><strong>Purpose:</strong> Hash the password before saving</li>
+        </ul>
+
+        <h3><code>authenticationManager.authenticate(...)</code></h3>
+        <ul>
+          <li><strong>When?</strong> During login</li>
+          <li><strong>Purpose:</strong> Ask Spring to verify username and password</li>
+        </ul>
+
+        <h3><code>jwtUtil.generateToken(username)</code></h3>
+        <ul>
+          <li><strong>When?</strong> After successful login</li>
+          <li><strong>Purpose:</strong> Create JWT token for future requests</li>
+        </ul>
+
+        <h3><code>doFilterInternal(request, response, filterChain)</code></h3>
+        <ul>
+          <li><strong>Who calls it?</strong> Spring Security filter chain</li>
+          <li><strong>When?</strong> For each incoming request</li>
+          <li><strong>Purpose:</strong> Read and validate JWT before request reaches controller</li>
+        </ul>
+
+        <h3><code>filterChain.doFilter(request, response)</code></h3>
+        <ul>
+          <li><strong>Meaning:</strong> Continue to next filter or controller</li>
+          <li><strong>If omitted:</strong> request stops there</li>
+        </ul>
+      </article>
+
+      <article class="card" id="filter-chain">
+        <h2>9. SecurityFilterChain Explained</h2>
+        <pre>@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/auth/register", "/auth/login").permitAll()
+            .anyRequest().authenticated()
+        )
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}</pre>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>csrf(csrf -&gt; csrf.disable())</code></td>
+                <td>Disables CSRF for REST API style usage, especially common with JWT</td>
+              </tr>
+              <tr>
+                <td><code>requestMatchers(...).permitAll()</code></td>
+                <td>These URLs can be used without login</td>
+              </tr>
+              <tr>
+                <td><code>anyRequest().authenticated()</code></td>
+                <td>All other requests need authenticated user</td>
+              </tr>
+              <tr>
+                <td><code>SessionCreationPolicy.STATELESS</code></td>
+                <td>Do not use HTTP session; JWT is stateless</td>
+              </tr>
+              <tr>
+                <td><code>addFilterBefore(...)</code></td>
+                <td>Run custom JWT filter before Spring's username/password filter</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card" id="debugging">
+        <h2>10. Common Errors and Their Meaning</h2>
+        <div class="mini-grid">
+          <div class="mini">
+            <strong class="warn">403 Forbidden</strong>
+            Usually request reached Spring Security but was denied. Common reason: CSRF enabled or endpoint not permitted.
+          </div>
+          <div class="mini">
+            <strong class="danger">401 Unauthorized</strong>
+            Authentication is missing or invalid. Example: token not sent or token invalid.
+          </div>
+          <div class="mini">
+            <strong>Invalid CSRF token</strong>
+            Common in POST/PUT/DELETE when using default Spring Security without disabling CSRF for API learning project.
+          </div>
+          <div class="mini">
+            <strong>User not found</strong>
+            <code>loadUserByUsername()</code> could not find the user in DB.
+          </div>
+          <div class="mini">
+            <strong>Bad credentials</strong>
+            Username exists but password does not match encoded password in DB.
+          </div>
+          <div class="mini">
+            <strong>Expired JWT</strong>
+            Token time limit is over; login again to get new token.
+          </div>
+        </div>
+      </article>
+
+      <article class="card" id="summary-table">
+        <h2>11. Summary Table</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Class / Method</th>
+                <th>Who calls it</th>
+                <th>When it runs</th>
+                <th>Why it exists</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>AuthController.register()</code></td>
+                <td>Client request</td>
+                <td>Register API call</td>
+                <td>Receives register request</td>
+              </tr>
+              <tr>
+                <td><code>AuthService.register()</code></td>
+                <td>Controller</td>
+                <td>During registration</td>
+                <td>Encodes password and saves user</td>
+              </tr>
+              <tr>
+                <td><code>PasswordEncoder.encode()</code></td>
+                <td>Your service</td>
+                <td>During registration</td>
+                <td>Hash password</td>
+              </tr>
+              <tr>
+                <td><code>AuthService.login()</code></td>
+                <td>Controller</td>
+                <td>During login</td>
+                <td>Starts authentication</td>
+              </tr>
+              <tr>
+                <td><code>AuthenticationManager.authenticate()</code></td>
+                <td>Your service</td>
+                <td>During login</td>
+                <td>Ask Spring to verify credentials</td>
+              </tr>
+              <tr>
+                <td><code>UserDetailsService.loadUserByUsername()</code></td>
+                <td>Spring Security</td>
+                <td>During login or token-based auth rebuild</td>
+                <td>Load user from DB</td>
+              </tr>
+              <tr>
+                <td><code>JwtUtil.generateToken()</code></td>
+                <td>Your service</td>
+                <td>After successful login</td>
+                <td>Create JWT</td>
+              </tr>
+              <tr>
+                <td><code>JwtAuthFilter.doFilterInternal()</code></td>
+                <td>Spring Security</td>
+                <td>For incoming requests</td>
+                <td>Extract and validate token</td>
+              </tr>
+              <tr>
+                <td><code>SecurityContextHolder.setAuthentication()</code></td>
+                <td>Your JWT filter</td>
+                <td>After token validation</td>
+                <td>Mark request as authenticated</td>
+              </tr>
+              <tr>
+                <td><code>UserController.profile()</code></td>
+                <td>Spring MVC</td>
+                <td>After auth succeeds</td>
+                <td>Return protected data</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card" id="practice">
+        <h2>12. Practice Questions</h2>
+        <ol>
+          <li>What is the difference between authentication and authorization?</li>
+          <li>Who calls <code>loadUserByUsername()</code> and when?</li>
+          <li>Why do we use <code>PasswordEncoder.encode()</code> during registration?</li>
+          <li>What does <code>AuthenticationManager.authenticate()</code> actually do internally?</li>
+          <li>Why do we set authentication in <code>SecurityContextHolder</code>?</li>
+          <li>What is the purpose of <code>JwtAuthFilter</code>?</li>
+          <li>Why is <code>filterChain.doFilter(request, response)</code> necessary?</li>
+          <li>Why do we often use <code>SessionCreationPolicy.STATELESS</code> with JWT?</li>
+          <li>Why can a user be authenticated but still get access denied?</li>
+          <li>What path does a request follow from entering the app to reaching the controller?</li>
+        </ol>
+
+        <div class="footer-note">
+          Final memory line: <strong>Request → Filter → Authentication → SecurityContext → Authorization → Controller</strong>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

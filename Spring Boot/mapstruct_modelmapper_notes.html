@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MapStruct vs ModelMapper - Detailed Java Notes</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --primary: #1f5eff;
+      --primary-dark: #1747bf;
+      --secondary: #00a884;
+      --danger: #d63333;
+      --warning: #f59f00;
+      --text: #1f2937;
+      --muted: #64748b;
+      --border: #dbe3ef;
+      --code-bg: #111827;
+      --code-text: #e5e7eb;
+      --good-bg: #e8f8f3;
+      --bad-bg: #fff1f1;
+      --note-bg: #fff8db;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    header {
+      background: linear-gradient(135deg, #183b8f, #1f5eff, #00a884);
+      color: white;
+      padding: 46px 24px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 12px;
+      font-size: 2.4rem;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      margin: 0 auto;
+      max-width: 850px;
+      font-size: 1.05rem;
+      opacity: 0.95;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 70px;
+    }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      margin-bottom: 24px;
+    }
+
+    .toc h2 {
+      margin-top: 0;
+    }
+
+    .toc a {
+      display: inline-block;
+      margin: 6px 12px 6px 0;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef4ff;
+      color: var(--primary-dark);
+      text-decoration: none;
+      font-size: 0.95rem;
+      border: 1px solid #d5e3ff;
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px;
+      margin: 24px 0;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    h2 {
+      color: #12326f;
+      margin-top: 0;
+      font-size: 1.7rem;
+      border-left: 5px solid var(--primary);
+      padding-left: 12px;
+    }
+
+    h3 {
+      color: #1747bf;
+      margin-top: 24px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #eef4ff;
+      color: var(--primary-dark);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      background: #fbfdff;
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 18px 0;
+    }
+
+    .flow span {
+      background: #eef4ff;
+      border: 1px solid #d5e3ff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .arrow {
+      color: var(--primary);
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 18px;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-size: 0.93rem;
+      border: 1px solid #263244;
+    }
+
+    code {
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+    }
+
+    .note, .good, .bad, .interview {
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin: 16px 0;
+      border: 1px solid transparent;
+    }
+
+    .note {
+      background: var(--note-bg);
+      border-color: #ffe08a;
+    }
+
+    .good {
+      background: var(--good-bg);
+      border-color: #b8ebdc;
+    }
+
+    .bad {
+      background: var(--bad-bg);
+      border-color: #ffc7c7;
+    }
+
+    .interview {
+      background: #eef4ff;
+      border-color: #c8d9ff;
+    }
+
+    .label-good {
+      color: var(--secondary);
+      font-weight: 700;
+    }
+
+    .label-bad {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      overflow: hidden;
+      border-radius: 14px;
+      display: table;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef4ff;
+      color: #12326f;
+    }
+
+    tr:nth-child(even) td {
+      background: #fbfdff;
+    }
+
+    ul, ol {
+      padding-left: 24px;
+    }
+
+    .checklist li {
+      margin-bottom: 8px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 30px;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 800px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 20px;
+      }
+
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead tr {
+        display: none;
+      }
+
+      td {
+        border-bottom: none;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        display: block;
+        margin-bottom: 4px;
+        color: var(--primary-dark);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MapStruct vs ModelMapper</h1>
+    <p>Detailed Java/Spring Boot notes to understand object mapping, DTO conversion, list mapping, nested mapping, partial update mapping, and interview-ready answers.</p>
+  </header>
+
+  <main class="container">
+    <div class="toc">
+      <h2>Table of Contents</h2>
+      <a href="#why">Why Mapping?</a>
+      <a href="#mapstruct">MapStruct</a>
+      <a href="#modelmapper">ModelMapper</a>
+      <a href="#comparison">Comparison</a>
+      <a href="#nested">Nested Mapping</a>
+      <a href="#update">Partial Update</a>
+      <a href="#mistakes">Common Mistakes</a>
+      <a href="#interview">Interview Answers</a>
+      <a href="#practice">Practice Plan</a>
+    </div>
+
+    <section id="why">
+      <h2>1. Why Do We Need Data Mapping?</h2>
+      <p>In Spring Boot applications, we should not directly expose database entities in API responses. We usually convert data between objects.</p>
+
+      <div class="flow">
+        <span>Request DTO</span>
+        <b class="arrow">→</b>
+        <span>Entity</span>
+        <b class="arrow">→</b>
+        <span>Database</span>
+        <b class="arrow">→</b>
+        <span>Entity</span>
+        <b class="arrow">→</b>
+        <span>Response DTO</span>
+      </div>
+
+      <h3>Example</h3>
+      <pre><code>EmployeeRequest  -> EmployeeEntity
+EmployeeEntity   -> EmployeeResponse
+List&lt;Employee&gt;   -> List&lt;EmployeeResponse&gt;</code></pre>
+
+      <div class="note">
+        <strong>Simple meaning:</strong> Mapping means converting data from one object to another object.
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Manual Mapping First</h2>
+      <p>Before learning MapStruct and ModelMapper, you should understand manual mapping.</p>
+
+      <pre><code>public EmployeeResponse toResponse(Employee employee) {
+    EmployeeResponse response = new EmployeeResponse();
+    response.setId(employee.getId());
+    response.setName(employee.getName());
+    response.setEmail(employee.getEmail());
+    return response;
+}</code></pre>
+
+      <div class="good">
+        <strong>Advantage:</strong> Full control and easy to debug.
+      </div>
+
+      <div class="bad">
+        <strong>Disadvantage:</strong> Repetitive when there are many DTOs and fields.
+      </div>
+    </section>
+
+    <section id="mapstruct">
+      <h2>3. What is MapStruct?</h2>
+      <p><strong>MapStruct</strong> is a compile-time Java bean mapping library. You create a mapper interface, and MapStruct generates the implementation class during compilation.</p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>How MapStruct Works</h3>
+          <ol>
+            <li>You create an interface.</li>
+            <li>You add <code>@Mapper</code>.</li>
+            <li>MapStruct generates implementation at compile time.</li>
+            <li>Spring injects the mapper bean.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Why It Is Good</h3>
+          <ul>
+            <li>Fast performance.</li>
+            <li>Compile-time safety.</li>
+            <li>No reflection.</li>
+            <li>Best for enterprise projects.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Maven Dependency</h3>
+      <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.mapstruct&lt;/groupId&gt;
+    &lt;artifactId&gt;mapstruct&lt;/artifactId&gt;
+    &lt;version&gt;1.5.5.Final&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;org.mapstruct&lt;/groupId&gt;
+    &lt;artifactId&gt;mapstruct-processor&lt;/artifactId&gt;
+    &lt;version&gt;1.5.5.Final&lt;/version&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+
+      <h3>Entity</h3>
+      <pre><code>public class Employee {
+    private Long id;
+    private String name;
+    private String email;
+    private Double salary;
+
+    // getters and setters
+}</code></pre>
+
+      <h3>Request DTO</h3>
+      <pre><code>public class EmployeeRequest {
+    private String name;
+    private String email;
+    private Double salary;
+
+    // getters and setters
+}</code></pre>
+
+      <h3>Response DTO</h3>
+      <pre><code>public class EmployeeResponse {
+    private Long id;
+    private String name;
+    private String email;
+
+    // salary is not exposed in response
+}</code></pre>
+
+      <h3>MapStruct Mapper</h3>
+      <pre><code>import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface EmployeeMapper {
+
+    @Mapping(target = "id", ignore = true)
+    Employee toEntity(EmployeeRequest request);
+
+    EmployeeResponse toResponse(Employee employee);
+
+    List&lt;EmployeeResponse&gt; toResponseList(List&lt;Employee&gt; employees);
+}</code></pre>
+
+      <div class="note">
+        <strong>componentModel = "spring"</strong> means MapStruct will generate the mapper implementation as a Spring Bean, so you can inject it using constructor injection.
+      </div>
+
+      <h3>Service Usage</h3>
+      <pre><code>@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeMapper employeeMapper;
+
+    public EmployeeResponse createEmployee(EmployeeRequest request) {
+        Employee employee = employeeMapper.toEntity(request);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return employeeMapper.toResponse(savedEmployee);
+    }
+}</code></pre>
+
+      <h3>Generated Code Concept</h3>
+      <p>You do not write this code, but MapStruct generates similar code internally.</p>
+      <pre><code>@Component
+public class EmployeeMapperImpl implements EmployeeMapper {
+
+    @Override
+    public EmployeeResponse toResponse(Employee employee) {
+        if (employee == null) {
+            return null;
+        }
+
+        EmployeeResponse response = new EmployeeResponse();
+        response.setId(employee.getId());
+        response.setName(employee.getName());
+        response.setEmail(employee.getEmail());
+        return response;
+    }
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>4. MapStruct When Field Names Are Different</h2>
+      <p>If source and target field names are different, use <code>@Mapping</code>.</p>
+
+      <pre><code>public class Employee {
+    private String employeeName;
+}
+
+public class EmployeeResponse {
+    private String name;
+}</code></pre>
+
+      <pre><code>@Mapper(componentModel = "spring")
+public interface EmployeeMapper {
+
+    @Mapping(source = "employeeName", target = "name")
+    EmployeeResponse toResponse(Employee employee);
+}</code></pre>
+
+      <div class="note">
+        <strong>Meaning:</strong> employee.employeeName will be mapped to response.name.
+      </div>
+    </section>
+
+    <section id="modelmapper">
+      <h2>5. What is ModelMapper?</h2>
+      <p><strong>ModelMapper</strong> is a runtime object mapping library. It maps objects while the application is running. It mainly uses reflection and naming conventions.</p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>How ModelMapper Works</h3>
+          <ol>
+            <li>You create a ModelMapper bean.</li>
+            <li>You call <code>modelMapper.map(source, Target.class)</code>.</li>
+            <li>It checks matching fields at runtime.</li>
+            <li>It maps values automatically.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Why It Is Easy</h3>
+          <ul>
+            <li>Very less code.</li>
+            <li>Good for simple DTOs.</li>
+            <li>Quick for demo or small project.</li>
+            <li>Works well when field names are same.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Maven Dependency</h3>
+      <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.modelmapper&lt;/groupId&gt;
+    &lt;artifactId&gt;modelmapper&lt;/artifactId&gt;
+    &lt;version&gt;3.2.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+      <h3>Spring Boot Configuration</h3>
+      <pre><code>@Configuration
+public class ModelMapperConfig {
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
+}</code></pre>
+
+      <h3>Service Usage</h3>
+      <pre><code>@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+
+    private final ModelMapper modelMapper;
+    private final EmployeeRepository employeeRepository;
+
+    public EmployeeResponse createEmployee(EmployeeRequest request) {
+        Employee employee = modelMapper.map(request, Employee.class);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return modelMapper.map(savedEmployee, EmployeeResponse.class);
+    }
+}</code></pre>
+
+      <div class="note">
+        <strong>Important:</strong> ModelMapper is simple, but for complex enterprise mapping, debugging can become difficult because mapping happens at runtime.
+      </div>
+    </section>
+
+    <section>
+      <h2>6. ModelMapper With Different Field Names</h2>
+      <p>When field names are different, you need custom configuration.</p>
+
+      <pre><code>public class Employee {
+    private String employeeName;
+}
+
+public class EmployeeResponse {
+    private String name;
+}</code></pre>
+
+      <pre><code>TypeMap&lt;Employee, EmployeeResponse&gt; typeMap =
+        modelMapper.createTypeMap(Employee.class, EmployeeResponse.class);
+
+typeMap.addMapping(Employee::getEmployeeName, EmployeeResponse::setName);</code></pre>
+
+      <div class="bad">
+        <strong>Problem:</strong> For many complex mappings, ModelMapper configuration can become less readable compared to MapStruct.
+      </div>
+    </section>
+
+    <section id="comparison">
+      <h2>7. MapStruct vs ModelMapper</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Point</th>
+            <th>MapStruct</th>
+            <th>ModelMapper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Point">Mapping Time</td>
+            <td data-label="MapStruct">Compile time</td>
+            <td data-label="ModelMapper">Runtime</td>
+          </tr>
+          <tr>
+            <td data-label="Point">Internally Uses</td>
+            <td data-label="MapStruct">Generated Java setter/getter code</td>
+            <td data-label="ModelMapper">Reflection and conventions</td>
+          </tr>
+          <tr>
+            <td data-label="Point">Performance</td>
+            <td data-label="MapStruct">Faster</td>
+            <td data-label="ModelMapper">Slower compared to MapStruct</td>
+          </tr>
+          <tr>
+            <td data-label="Point">Error Detection</td>
+            <td data-label="MapStruct">Compile-time errors</td>
+            <td data-label="ModelMapper">Runtime errors possible</td>
+          </tr>
+          <tr>
+            <td data-label="Point">Debugging</td>
+            <td data-label="MapStruct">Easy, generated code can be checked</td>
+            <td data-label="ModelMapper">Harder in complex scenarios</td>
+          </tr>
+          <tr>
+            <td data-label="Point">Best For</td>
+            <td data-label="MapStruct">Enterprise and production projects</td>
+            <td data-label="ModelMapper">Small apps, demos, simple DTOs</td>
+          </tr>
+          <tr>
+            <td data-label="Point">Code Style</td>
+            <td data-label="MapStruct">Interface based</td>
+            <td data-label="ModelMapper">Object method call based</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="good">
+        <strong>Recommendation:</strong> For interviews and enterprise Java projects, prefer MapStruct. Understand ModelMapper also, but make MapStruct your main answer.
+      </div>
+    </section>
+
+    <section id="nested">
+      <h2>8. Nested Object Mapping</h2>
+      <p>Nested mapping is very common in real projects.</p>
+
+      <pre><code>public class Employee {
+    private Long id;
+    private String name;
+    private Department department;
+}
+
+public class Department {
+    private Long id;
+    private String name;
+}
+
+public class EmployeeResponse {
+    private Long id;
+    private String name;
+    private String departmentName;
+}</code></pre>
+
+      <h3>MapStruct Nested Mapping</h3>
+      <pre><code>@Mapper(componentModel = "spring")
+public interface EmployeeMapper {
+
+    @Mapping(source = "department.name", target = "departmentName")
+    EmployeeResponse toResponse(Employee employee);
+}</code></pre>
+
+      <h3>ModelMapper Nested Mapping</h3>
+      <pre><code>modelMapper.typeMap(Employee.class, EmployeeResponse.class)
+        .addMappings(mapper -> {
+            mapper.map(src -> src.getDepartment().getName(),
+                       EmployeeResponse::setDepartmentName);
+        });</code></pre>
+
+      <div class="note">
+        <strong>Observation:</strong> For nested mapping, MapStruct is usually cleaner and more readable.
+      </div>
+    </section>
+
+    <section id="update">
+      <h2>9. Partial Update Mapping</h2>
+      <p>In update APIs, do not blindly create a new entity from request. First fetch existing entity, then update it.</p>
+
+      <h3>Bad Approach</h3>
+      <pre><code>Employee employee = employeeMapper.toEntity(request);
+employee.setId(id);
+employeeRepository.save(employee);</code></pre>
+
+      <div class="bad">
+        <strong>Why bad?</strong> Existing values can become null, audit fields can be lost, and relationships can break.
+      </div>
+
+      <h3>Good MapStruct Approach</h3>
+      <pre><code>@Mapper(componentModel = "spring")
+public interface EmployeeMapper {
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEmployeeFromRequest(EmployeeUpdateRequest request,
+                                   @MappingTarget Employee employee);
+}</code></pre>
+
+      <h3>Service Usage</h3>
+      <pre><code>public EmployeeResponse updateEmployee(Long id, EmployeeUpdateRequest request) {
+    Employee employee = employeeRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+    employeeMapper.updateEmployeeFromRequest(request, employee);
+
+    Employee updatedEmployee = employeeRepository.save(employee);
+    return employeeMapper.toResponse(updatedEmployee);
+}</code></pre>
+
+      <div class="good">
+        <strong>Meaning:</strong> If request field is null, MapStruct will not overwrite the existing entity field.
+      </div>
+    </section>
+
+    <section id="mistakes">
+      <h2>10. Common Mistakes in Data Mapping</h2>
+
+      <h3>1. Exposing Entity Directly</h3>
+      <pre><code>// Bad
+@GetMapping("/{id}")
+public Employee getEmployee(@PathVariable Long id) {
+    return employeeRepository.findById(id).get();
+}</code></pre>
+
+      <div class="bad">
+        Entity may expose sensitive fields. Entity should not become your API contract.
+      </div>
+
+      <pre><code>// Good
+@GetMapping("/{id}")
+public EmployeeResponse getEmployee(@PathVariable Long id) {
+    return employeeService.getEmployee(id);
+}</code></pre>
+
+      <h3>2. Mapping Inside Controller</h3>
+      <p>Controller should only receive request and return response. Mapping should be in mapper layer or service layer through mapper.</p>
+
+      <h3>3. Blindly Mapping ID from Request</h3>
+      <pre><code>@Mapping(target = "id", ignore = true)
+Employee toEntity(EmployeeRequest request);</code></pre>
+
+      <h3>4. Not Handling Null Values During Update</h3>
+      <p>For PATCH/update APIs, use <code>NullValuePropertyMappingStrategy.IGNORE</code> to avoid overwriting existing values with null.</p>
+    </section>
+
+    <section id="interview">
+      <h2>11. Interview Answers</h2>
+
+      <div class="interview">
+        <h3>Q1. What is MapStruct?</h3>
+        <p><strong>Answer:</strong> MapStruct is a compile-time Java bean mapping library. We define mapper interfaces and MapStruct generates implementation classes during compilation. It maps DTOs to entities and entities to DTOs using generated getter/setter code. It is faster and safer than reflection-based mappers, so it is preferred in enterprise applications.</p>
+      </div>
+
+      <div class="interview">
+        <h3>Q2. What is ModelMapper?</h3>
+        <p><strong>Answer:</strong> ModelMapper is a runtime object mapping library. It maps one object to another using reflection and naming conventions. It is easy to use when source and target fields have the same names, but complex mappings can become harder to debug.</p>
+      </div>
+
+      <div class="interview">
+        <h3>Q3. Difference between MapStruct and ModelMapper?</h3>
+        <p><strong>Answer:</strong> MapStruct performs mapping at compile time by generating Java code, while ModelMapper performs mapping at runtime using reflection. MapStruct is faster, type-safe, and better for enterprise projects. ModelMapper is easier to start with but less predictable in complex scenarios.</p>
+      </div>
+
+      <div class="interview">
+        <h3>Q4. Why should we not expose Entity directly?</h3>
+        <p><strong>Answer:</strong> We should not expose entity directly because it may contain sensitive fields, lazy-loaded relationships, internal database structure, and audit fields. DTOs help us control what data is accepted in request and what data is returned in response.</p>
+      </div>
+
+      <div class="interview">
+        <h3>Q5. How do you handle partial update using MapStruct?</h3>
+        <p><strong>Answer:</strong> First, we fetch the existing entity from the database. Then we use MapStruct with <code>@MappingTarget</code> to update the same entity. For PATCH APIs, we use <code>NullValuePropertyMappingStrategy.IGNORE</code> so null request fields do not overwrite existing values.</p>
+      </div>
+    </section>
+
+    <section id="practice">
+      <h2>12. Practice Plan to Master Mapping</h2>
+      <ol class="checklist">
+        <li>Create <code>Employee</code> entity with id, name, email, salary, department.</li>
+        <li>Create <code>EmployeeRequest</code> with name, email, salary, departmentId.</li>
+        <li>Create <code>EmployeeResponse</code> with id, name, email, departmentName.</li>
+        <li>Create manual mapper first.</li>
+        <li>Replace manual mapper with MapStruct.</li>
+        <li>Add list mapping: <code>List&lt;Employee&gt;</code> to <code>List&lt;EmployeeResponse&gt;</code>.</li>
+        <li>Add nested mapping: <code>department.name</code> to <code>departmentName</code>.</li>
+        <li>Add update API using <code>@MappingTarget</code>.</li>
+        <li>Add null ignore strategy for PATCH update.</li>
+        <li>Try same mapping using ModelMapper and compare readability.</li>
+      </ol>
+
+      <div class="good">
+        <strong>Today target:</strong> Master Request DTO to Entity, Entity to Response DTO, List Mapping, Nested Mapping, and Partial Update Mapping.
+      </div>
+    </section>
+
+    <section>
+      <h2>13. Final Short Revision</h2>
+      <pre><code>MapStruct:
+- Compile-time mapper
+- Generates Java implementation code
+- Fast and type-safe
+- Best for enterprise projects
+
+ModelMapper:
+- Runtime mapper
+- Uses reflection
+- Very easy to start
+- Good for simple DTOs
+- Harder to debug in complex mapping
+
+Best Interview Line:
+In enterprise Spring Boot applications, I prefer MapStruct because it provides compile-time safety, better performance, and clear mapping logic.</code></pre>
+    </section>
+
+    <p class="footer">Prepared as Java/Spring Boot interview notes for mastering data mapping techniques.</p>
+  </main>
+</body>
+</html>
